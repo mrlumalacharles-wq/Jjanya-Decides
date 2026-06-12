@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JJANYA DECIDES</title>
+<style>
+  :root{
+    --ink:#1c2b1f;
+    --paper:#f6f3ea;
+    --ballot:#fffdf7;
+    --green:#2f6f4f;
+    --green-dark:#1f4d36;
+    --gold:#c9a13b;
+    --line:#d9d2bf;
+    --danger:#a8432f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Georgia', 'Times New Roman', serif;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  header{
+    background:var(--green-dark);
+    color:var(--paper);
+    padding:22px 16px;
+    text-align:center;
+    border-bottom:6px solid var(--gold);
+  }
+  header h1{
+    margin:0;
+    font-size:1.9rem;
+    letter-spacing:3px;
+    font-weight:700;
+  }
+  header p{
+    margin:6px 0 0;
+    font-family: Arial, sans-serif;
+    font-size:0.8rem;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    opacity:0.85;
+  }
+  main{
+    max-width:760px;
+    margin:0 auto;
+    padding:18px 14px 60px;
+  }
+  .card{
+    background:var(--ballot);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:16px;
+    margin-bottom:18px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.04);
+  }
+  .card h2{
+    margin:0 0 12px;
+    font-size:1.1rem;
+    color:var(--green-dark);
+    border-bottom:2px solid var(--gold);
+    display:inline-block;
+    padding-bottom:4px;
+  }
+  label{
+    display:block;
+    font-family:Arial, sans-serif;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#555;
+    margin-bottom:4px;
+  }
+  input[type=text], input[type=number]{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    font-size:1rem;
+    font-family:inherit;
+    background:#fff;
+  }
+  input:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  .row{ display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .row > div{ flex:1; min-width:140px; }
+  button{
+    font-family:Arial, sans-serif;
+    font-weight:700;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    font-size:0.8rem;
+    border:none;
+    border-radius:4px;
+    padding:11px 18px;
+    cursor:pointer;
+    transition:background 0.15s;
+  }
+  .btn-primary{ background:var(--green); color:#fff; }
+  .btn-primary:hover{ background:var(--green-dark); }
+  .btn-danger{ background:transparent; color:var(--danger); border:1px solid var(--danger); }
+  .btn-danger:hover{ background:var(--danger); color:#fff; }
+  .btn-ghost{ background:transparent; color:var(--green-dark); border:1px solid var(--green-dark); }
+  .btn-ghost:hover{ background:var(--green-dark); color:#fff; }
+
+  table{ width:100%; border-collapse:collapse; font-size:0.92rem; }
+  th, td{ border:1px solid var(--line); padding:8px; text-align:center; }
+  th{ background:var(--green-dark); color:#fff; font-family:Arial, sans-serif; font-size:0.72rem; text-transform:uppercase; letter-spacing:1px; }
+  td.name{ text-align:left; font-weight:700; }
+  td input{ width:64px; padding:6px; text-align:center; }
+  tr:nth-child(even) td{ background:#fbf9f1; }
+  tr.leader td{ background:#eef6ee !important; }
+  tr.leader td.name::before{ content:"★ "; color:var(--gold); }
+
+  .empty{
+    text-align:center;
+    font-family:Arial, sans-serif;
+    color:#888;
+    padding:24px 10px;
+    font-style:italic;
+  }
+  .candidate-list{ display:flex; flex-direction:column; gap:8px; max-height:260px; overflow:auto; padding-right:4px; }
+  .candidate-item{
+    display:flex; justify-content:space-between; align-items:center;
+    border:1px solid var(--line); border-radius:4px; padding:8px 10px; background:#fff;
+  }
+  .candidate-item span{ font-weight:700; }
+  .count-pill{
+    font-family:Arial, sans-serif; font-size:0.72rem; background:var(--green); color:#fff;
+    padding:3px 8px; border-radius:10px; letter-spacing:1px;
+  }
+  .total-banner{
+    font-family:Arial, sans-serif; text-align:center; padding:10px; margin-bottom:14px;
+    background:var(--green-dark); color:#fff; border-radius:6px; letter-spacing:1px; font-size:0.85rem;
+  }
+  .total-banner b{ color:var(--gold); font-size:1rem; }
+  footer{ text-align:center; font-family:Arial, sans-serif; font-size:0.7rem; color:#999; padding:20px 0; letter-spacing:1px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>JJANYA DECIDES</h1>
+  <p id="headerSubtitle">Official Vote Tally · 5 Polling Centres</p>
+</header>
+
+<main>
+
+  <div class="total-banner" id="summaryBanner">No post selected yet.</div>
+
+  <!-- Add post -->
+  <div class="card">
+    <h2>Set Post / Position</h2>
+    <div class="row">
+      <div>
+        <label for="postName">Post Being Contested</label>
+        <input type="text" id="postName" placeholder="e.g. Head Prefect" maxlength="80">
+      </div>
+    </div>
+    <button class="btn-primary" id="setPostBtn">Save Post</button>
+    <p id="postError" style="color:var(--danger); font-family:Arial, sans-serif; font-size:0.8rem; margin:8px 0 0;"></p>
+  </div>
+
+  <!-- Add candidate -->
+  <div class="card">
+    <h2>Add Contestant</h2>
+    <div class="row">
+      <div>
+        <label for="candName">Contestant Name</label>
+        <input type="text" id="candName" placeholder="e.g. Akello Grace" maxlength="60">
+      </div>
+    </div>
+    <button class="btn-primary" id="addCandBtn">Add Contestant</button>
+    <p id="candError" style="color:var(--danger); font-family:Arial, sans-serif; font-size:0.8rem; margin:8px 0 0;"></p>
+  </div>
+
+  <!-- Candidate list -->
+  <div class="card">
+    <h2>Contestants (<span id="candCount">0</span> / 50)</h2>
+    <div class="candidate-list" id="candidateList">
+      <p class="empty">No contestants yet. Add contestants above.</p>
+    </div>
+  </div>
+
+  <!-- Enter votes -->
+  <div class="card">
+    <h2>Enter Marks (Votes) Per Polling Centre</h2>
+    <div class="row">
+      <div>
+        <label for="centreSelect">Polling Centre</label>
+        <select id="centreSelect" style="width:100%; padding:9px; border:1px solid var(--line); border-radius:4px; font-family:inherit; font-size:1rem;">
+          <option>Centre 1</option>
+          <option>Centre 2</option>
+          <option>Centre 3</option>
+          <option>Centre 4</option>
+          <option>Centre 5</option>
+        </select>
+      </div>
+    </div>
+    <div id="voteEntryArea">
+      <p class="empty">Add contestants first to enter marks.</p>
+    </div>
+    <button class="btn-primary" id="saveVotesBtn" style="margin-top:10px;">Save Marks for This Centre</button>
+    <p id="saveMsg" style="font-family:Arial, sans-serif; font-size:0.8rem; color:var(--green-dark); margin:8px 0 0;"></p>
+  </div>
+
+  <!-- Results -->
+  <div class="card">
+    <h2>Results &amp; Final Tally — <span id="resultsPostName">No Post Set</span></h2>
+    <div style="overflow-x:auto;">
+      <table id="resultsTable">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Contestant</th>
+            <th>C1</th><th>C2</th><th>C3</th><th>C4</th><th>C5</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr><td colspan="7" class="empty">No data to display yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Manage</h2>
+    <button class="btn-ghost" id="exportBtn">Export Results (CSV)</button>
+    <button class="btn-danger" id="resetBtn" style="margin-left:8px;">Reset Everything</button>
+  </div>
+
+</main>
+
+<footer>JJANYA DECIDES — totals are calculated automatically as votes are entered.</footer>
+
+<script>
+  const CENTRES = ['Centre 1','Centre 2','Centre 3','Centre 4','Centre 5'];
+  let candidates = []; // {id, name, votes: {Centre 1: n, ...}}
+  let postName = '';
+
+  const postNameInput = document.getElementById('postName');
+  const setPostBtn = document.getElementById('setPostBtn');
+  const postError = document.getElementById('postError');
+  const headerSubtitle = document.getElementById('headerSubtitle');
+  const resultsPostName = document.getElementById('resultsPostName');
+  const candNameInput = document.getElementById('candName');
+  const addCandBtn = document.getElementById('addCandBtn');
+  const candError = document.getElementById('candError');
+  const candidateList = document.getElementById('candidateList');
+  const candCount = document.getElementById('candCount');
+  const centreSelect = document.getElementById('centreSelect');
+  const voteEntryArea = document.getElementById('voteEntryArea');
+  const saveVotesBtn = document.getElementById('saveVotesBtn');
+  const saveMsg = document.getElementById('saveMsg');
+  const resultsBody = document.getElementById('resultsBody');
+  const summaryBanner = document.getElementById('summaryBanner');
+  const exportBtn = document.getElementById('exportBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  function uid(){ return 'c' + Math.random().toString(36).slice(2,9); }
+
+  function setPost(){
+    const name = postNameInput.value.trim();
+    postError.textContent = '';
+    if(!name){
+      postError.textContent = 'Enter a post/position name.';
+      return;
+    }
+    postName = name;
+    headerSubtitle.textContent = `Official Vote Tally · 5 Polling Centres · ${postName}`;
+    renderAll();
+  }
+
+  function addCandidate(){
+    const name = candNameInput.value.trim();
+    candError.textContent = '';
+    if(!name){
+      candError.textContent = 'Enter a candidate name.';
+      return;
+    }
+    if(candidates.length >= 50){
+      candError.textContent = 'Maximum of 50 candidates reached.';
+      return;
+    }
+    if(candidates.some(c => c.name.toLowerCase() === name.toLowerCase())){
+      candError.textContent = 'This candidate is already on the list.';
+      return;
+    }
+    const votes = {};
+    CENTRES.forEach(c => votes[c] = 0);
+    candidates.push({ id: uid(), name, votes });
+    candNameInput.value = '';
+    renderAll();
+  }
+
+  function removeCandidate(id){
+    candidates = candidates.filter(c => c.id !== id);
+    renderAll();
+  }
+
+  function renderCandidateList(){
+    candCount.textContent = candidates.length;
+    if(candidates.length === 0){
+      candidateList.innerHTML = '<p class="empty">No candidates yet. Add candidates above.</p>';
+      return;
+    }
+    candidateList.innerHTML = candidates.map(c => {
+      const total = CENTRES.reduce((s,centre)=> s + (c.votes[centre]||0), 0);
+      return `<div class="candidate-item">
+        <span>${escapeHtml(c.name)}</span>
+        <span style="display:flex; align-items:center; gap:8px;">
+          <span class="count-pill">${total} votes</span>
+          <button class="btn-danger" style="padding:4px 8px; font-size:0.65rem;" onclick="window.__removeCand('${c.id}')">Remove</button>
+        </span>
+      </div>`;
+    }).join('');
+  }
+
+  function renderVoteEntry(){
+    if(candidates.length === 0){
+      voteEntryArea.innerHTML = '<p class="empty">Add contestants first to enter marks.</p>';
+      return;
+    }
+    const centre = centreSelect.value;
+    voteEntryArea.innerHTML = candidates.map(c => `
+      <div class="row" style="align-items:center;">
+        <div style="flex:2;"><label style="margin-bottom:0;">${escapeHtml(c.name)}</label></div>
+        <div style="flex:1;">
+          <input type="number" min="0" step="1" data-id="${c.id}" value="${c.votes[centre] ?? 0}">
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function saveVotes(){
+    const centre = centreSelect.value;
+    const inputs = voteEntryArea.querySelectorAll('input[data-id]');
+    inputs.forEach(inp => {
+      const id = inp.getAttribute('data-id');
+      const val = Math.max(0, parseInt(inp.value, 10) || 0);
+      const cand = candidates.find(c => c.id === id);
+      if(cand) cand.votes[centre] = val;
+    });
+    saveMsg.textContent = `Saved votes for ${centre}.`;
+    setTimeout(()=> saveMsg.textContent = '', 2500);
+    renderAll();
+  }
+
+  function renderResults(){
+    resultsPostName.textContent = postName ? postName : 'No Post Set';
+
+    if(candidates.length === 0){
+      resultsBody.innerHTML = '<tr><td colspan="7" class="empty">No data to display yet.</td></tr>';
+      summaryBanner.textContent = postName ? `Post: ${postName} — no contestants added yet.` : 'No post selected yet.';
+      return;
+    }
+    const rows = candidates.map(c => {
+      const total = CENTRES.reduce((s,centre)=> s + (c.votes[centre]||0), 0);
+      return { c, total };
+    }).sort((a,b) => b.total - a.total);
+
+    const grandTotal = rows.reduce((s,r)=> s + r.total, 0);
+    const leader = rows[0];
+
+    resultsBody.innerHTML = rows.map((r, idx) => `
+      <tr class="${idx===0 && r.total>0 ? 'leader' : ''}">
+        <td class="name">${escapeHtml(r.c.name)}</td>
+        ${CENTRES.map(centre => `<td>${r.c.votes[centre]||0}</td>`).join('')}
+        <td><b>${r.total}</b></td>
+      </tr>
+    `).join('');
+
+    const postLabel = postName ? `Post: <b>${escapeHtml(postName)}</b> &nbsp;|&nbsp; ` : '';
+    if(grandTotal === 0){
+      summaryBanner.innerHTML = `${postLabel}${candidates.length} contestant(s) added. No votes entered yet.`;
+    } else {
+      summaryBanner.innerHTML = `${postLabel}Total votes counted: <b>${grandTotal}</b> &nbsp;|&nbsp; Leading: <b>${escapeHtml(leader.c.name)}</b> (${leader.total})`;
+    }
+  }
+
+  function renderAll(){
+    renderCandidateList();
+    renderVoteEntry();
+    renderResults();
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function exportCSV(){
+    if(candidates.length === 0){ return; }
+    const header = ['Candidate', ...CENTRES, 'Total'];
+    const rows = candidates.map(c => {
+      const total = CENTRES.reduce((s,centre)=> s + (c.votes[centre]||0), 0);
+      return [c.name, ...CENTRES.map(centre => c.votes[centre]||0), total];
+    });
+    let csv = `"Post: ${postName || '(none)'}"\n`;
+    csv += header.join(',') + '\n';
+    rows.forEach(r => { csv += r.map(v => `"${v}"`).join(',') + '\n'; });
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jjanya_decides_results.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function resetAll(){
+    if(confirm('This will erase the post, all contestants and votes. Continue?')){
+      candidates = [];
+      postName = '';
+      postNameInput.value = '';
+      headerSubtitle.textContent = 'Official Vote Tally · 5 Polling Centres';
+      renderAll();
+    }
+  }
+
+  // Events
+  setPostBtn.addEventListener('click', setPost);
+  postNameInput.addEventListener('keydown', e => { if(e.key === 'Enter') setPost(); });
+  addCandBtn.addEventListener('click', addCandidate);
+  candNameInput.addEventListener('keydown', e => { if(e.key === 'Enter') addCandidate(); });
+  centreSelect.addEventListener('change', renderVoteEntry);
+  saveVotesBtn.addEventListener('click', saveVotes);
+  exportBtn.addEventListener('click', exportCSV);
+  resetBtn.addEventListener('click', resetAll);
+  window.__removeCand = removeCandidate;
+
+  renderAll();
+</script>
+
+</body>
+</html>
